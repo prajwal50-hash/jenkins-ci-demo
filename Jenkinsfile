@@ -1,26 +1,39 @@
-// this is a test webhook trigger
 pipeline {
     agent any
+
+    environment {
+        // You can define virtualenv path or environment variables here
+    }
 
     stages {
         stage('Clone') {
             steps {
-                echo "Cloning code from GitHub repo..."
+                echo "Cloning GitHub repository..."
             }
         }
-        stage('Build') {
+
+        stage('Install Requirements') {
             steps {
-                echo "Building the application..."
+                sh '''
+                python --version
+                pip install -r requirements.txt
+                '''
             }
         }
-        stage('Test') {
+
+        stage('Run Tests') {
             steps {
-                echo "Running tests..."
+                sh 'pytest tests/'
             }
         }
+
         stage('Deploy') {
             steps {
-                echo "Deploying application..."
+                sh '''
+                mkdir -p /tmp/python-app-deploy
+                cp -r * /tmp/python-app-deploy
+                echo "Deployed to /tmp/python-app-deploy"
+                '''
             }
         }
     }
